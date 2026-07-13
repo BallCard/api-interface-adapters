@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clean Claude Chat</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div>
+            <h1>Clean Claude</h1>
+            <p>Quiet daily chat</p>
+          </div>
+          <button id="newSessionBtn" class="icon-button" title="New session">+</button>
+        </div>
+
+        <div class="sidebar-controls">
+          <label class="field">
+            <span>Model</span>
+            <select id="modelSelect">
+              <option value="opus">Opus</option>
+              <option value="sonnet">Sonnet</option>
+              <option value="haiku">Haiku</option>
+              <option value="multimodal">Multimodal</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="sessionList" class="session-list"></div>
+      </aside>
+
+      <main class="chat-shell">
+        <header class="chat-header">
+          <div>
+            <div id="activeSessionLabel" class="eyebrow">session</div>
+            <h2 id="activeSessionTitle">default</h2>
+          </div>
+          <div id="status" class="status">Ready</div>
+        </header>
+
+        <section id="messages" class="messages"></section>
+
+        <form id="composer" class="composer">
+          <textarea
+            id="messageInput"
+            rows="1"
+            placeholder="Say something"
+          ></textarea>
+          <div class="composer-actions">
+            <button type="button" id="historyBtn" class="secondary-button">History</button>
+            <button type="submit" id="sendBtn" class="primary-button">Send</button>
+          </div>
+        </form>
+      </main>
+    </div>
+
+    <template id="messageTemplate">
+      <article class="message">
+        <div class="message-role"></div>
+        <div class="message-body"></div>
+      </article>
+    </template>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

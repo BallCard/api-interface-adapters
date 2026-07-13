@@ -1,0 +1,21 @@
+{
+  "name": "api-interface-adapters",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "chat:start": "node clean_claude_api/src/server.mjs",
+    "chat:cli": "node clean_claude_api/src/cli.mjs",
+    "chat:probe": "node clean_claude_api/src/probe.mjs",
+    "image:start": "node image2/server.mjs",
+    "image:generate": "node image2/generate.mjs",
+    "image2:start": "node image2/server.mjs",
+    "image2:generate": "node image2/generate.mjs",
+    "check:chat": "node --check clean_claude_api/src/server.mjs && node --check clean_claude_api/src/cli.mjs && node --check clean_claude_api/src/probe.mjs",
+    "check:image": "node --check image2/server.mjs && node --check image2/generate.mjs",
+    "check": "npm run check:chat && npm run check:image"
+  },
+  "dependencies": {
+    "openai": "^6.0.1"
+  }
+}
