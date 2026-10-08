@@ -1,20 +1,7 @@
-# api-interface-adapters
+# 接口适配器约定
 
-## Scope
-- This workspace stores reusable local interface bridges and API adapters.
-- Each adapter lives in its own directory and should be independently runnable.
-
-## Structure
-- One adapter per top-level directory.
-- Adapter source code stays inside that adapter directory.
-- Shared documentation may live at workspace root when it helps unified management.
-
-## Rules
-- Keep adapters thin and explicit.
-- Secrets must stay in environment variables or ignored local env files.
-- Do not hardcode API keys, tokens, or personal credentials.
-- Add a README for every adapter with startup, config, and routing notes.
-
-## Naming
-- Use lowercase `kebab-case` directory names.
-- Prefer names that describe protocol or role, not temporary experiments.
+- 每个顶层适配器独立运行，源码留在自身目录；聊天、图像和视频的职责分开，不重复实现已有接口。
+- 适配器保持轻薄、路由明确，不加入隐藏行为；优先使用根 README 的统一命令。
+- 密钥和上游配置仅放环境变量或被忽略的本地配置，不硬编码或提交凭据。
+- 每个适配器 README 说明启动、配置和路由；跨适配器契约见 [INTERFACES.md](INTERFACES.md)。
+- 新目录按协议或用途用英文 kebab-case 命名；修改后按 [README](README.md) 运行相关语法与健康检查。
