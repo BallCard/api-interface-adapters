@@ -1,0 +1,144 @@
+<section id="channel-control-center" aria-label="渠道控制中心交互方案">
+  <style>
+    #channel-control-center { display: grid; gap: 1rem; color: var(--foreground); }
+    #channel-control-center .layout { display: grid; grid-template-columns: minmax(190px, .9fr) minmax(0, 2.1fr); gap: 1rem; align-items: start; }
+    #channel-control-center .channel-list { display: grid; gap: .45rem; }
+    #channel-control-center .channel { width: 100%; text-align: left; display: grid; gap: .15rem; }
+    #channel-control-center .channel-name { font-weight: 500; }
+    #channel-control-center .channel-meta { color: var(--muted-foreground); }
+    #channel-control-center .status { display: inline-flex; gap: .35rem; align-items: center; color: var(--muted-foreground); }
+    #channel-control-center .status::before { content: ""; width: .55rem; height: .55rem; border-radius: 50%; background: var(--muted-foreground); }
+    #channel-control-center .status.ok::before { background: var(--viz-series-1); }
+    #channel-control-center .status.warn::before { background: var(--destructive); }
+    #channel-control-center .detail { display: grid; gap: 1rem; }
+    #channel-control-center .detail-head { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: space-between; align-items: center; }
+    #channel-control-center .key-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .5rem; align-items: end; }
+    #channel-control-center .field-stack { display: grid; gap: .65rem; }
+    #channel-control-center .guard-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
+    #channel-control-center .guard-grid label { display: grid; gap: .35rem; }
+    #channel-control-center .test-result { min-height: 1.4rem; }
+    #channel-control-center .is-hidden { display: none; }
+    @media (max-width: 560px) {
+      #channel-control-center .layout { grid-template-columns: 1fr; }
+      #channel-control-center .guard-grid { grid-template-columns: 1fr; }
+      #channel-control-center .key-row { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <div class="viz-row" aria-label="控制中心状态">
+    <span class="viz-badge" id="summary">1 个已验证 · 2 个待配置</span>
+    <span class="text-muted text-small">密钥仅显示指纹；保存后写入本地忽略文件</span>
+  </div>
+
+  <div class="layout">
+    <nav class="channel-list" aria-label="图片渠道">
+      <button class="btn channel is-selected" type="button" aria-pressed="true" data-channel="sakura">
+        <span class="channel-name">Sakura · gpt-image-2</span>
+        <span class="status ok text-small">模型清单已验证</span>
+      </button>
+      <button class="btn channel" type="button" aria-pressed="false" data-channel="official">
+        <span class="channel-name">OpenAI 官方</span>
+        <span class="status warn text-small">未配置密钥</span>
+      </button>
+      <button class="btn channel" type="button" aria-pressed="false" data-channel="backup">
+        <span class="channel-name">备用中转</span>
+        <span class="status warn text-small">未配置地址与密钥</span>
+      </button>
+      <button class="btn btn-ghost" type="button" id="add-channel">＋ 添加渠道</button>
+    </nav>
+
+    <form class="detail" id="channel-form">
+      <div class="detail-head">
+        <div>
+          <h3 id="channel-title">Sakura · gpt-image-2</h3>
+          <div class="text-muted text-small" id="channel-subtitle">当前生产默认渠道</div>
+        </div>
+        <span class="status ok" id="detail-status">模型清单已验证</span>
+      </div>
+
+      <div class="field-stack">
+        <label class="form-label">API 地址
+          <input class="form-control" id="base-url" value="https://sakura886.site/v1" autocomplete="off">
+        </label>
+        <div class="key-row">
+          <label class="form-label">API Key
+            <input class="form-control" id="api-key" value="已保存 · 指纹 f6be8a3346c1" readonly>
+          </label>
+          <button class="btn" type="button" id="replace-key">更换密钥</button>
+        </div>
+        <label class="form-label">默认模型
+          <select class="form-select" id="model"><option>gpt-image-2</option></select>
+        </label>
+      </div>
+
+      <div class="guard-grid" aria-label="成本与响应护栏">
+        <label class="form-label">单次图片数
+          <select class="form-select" id="image-count"><option>1</option><option>2</option><option>4</option></select>
+        </label>
+        <label class="form-label">单次预算上限
+          <select class="form-select" id="budget"><option>¥2</option><option>¥5</option><option>¥10</option></select>
+        </label>
+        <label class="form-label">响应体策略
+          <select class="form-select" id="response-mode"><option>落盘后仅返回 URL</option><option>返回 Base64</option></select>
+        </label>
+      </div>
+
+      <div class="viz-controls">
+        <button class="btn" type="button" id="probe">无成本连通性检查</button>
+        <button class="btn btn-primary" type="button" id="test">生成 1 张测试图</button>
+        <span class="text-small text-muted test-result" id="test-result" aria-live="polite">未执行测试生成</span>
+      </div>
+    </form>
+  </div>
+
+  <div class="card" aria-label="所选渠道执行策略">
+    <div class="text-muted text-small">请求路由</div>
+    <div id="route-preview">默认 → Sakura；失败仅在未收到上游响应前切换到下一个健康渠道；每次调用记录渠道、模型、图片数、耗时与估算成本。</div>
+  </div>
+
+  <script>
+    (() => {
+      const root = document.getElementById('channel-control-center');
+      const data = {
+        sakura: { title: 'Sakura · gpt-image-2', subtitle: '当前生产默认渠道', status: '模型清单已验证', base: 'https://sakura886.site/v1', key: '已保存 · 指纹 f6be8a3346c1', model: 'gpt-image-2', result: '模型清单已验证；未发起收费生成。', route: '默认 → Sakura；失败仅在未收到上游响应前切换到下一个健康渠道；每次调用记录渠道、模型、图片数、耗时与估算成本。', tone: 'ok' },
+        official: { title: 'OpenAI 官方', subtitle: '作为高可靠回退渠道', status: '未配置密钥', base: 'https://api.openai.com/v1', key: '尚未保存', model: 'gpt-image-2', result: '先保存密钥，再进行无成本连通性检查。', route: '仅当 Sakura 不可用且本次请求尚未被上游接受时，才作为回退；不会对同一请求重复收费。', tone: 'warn' },
+        backup: { title: '备用中转', subtitle: '隔离额度与供应商故障', status: '未配置地址与密钥', base: '', key: '尚未保存', model: '选择模型', result: '填写地址、密钥和模型后可检查。', route: '备用渠道独立保存预算与允许模型；不能继承生产渠道的无限制参数。', tone: 'warn' }
+      };
+      let selected = 'sakura';
+      const byId = (id) => document.getElementById(id);
+      const apply = (name) => {
+        selected = name;
+        const item = data[name];
+        root.querySelectorAll('[data-channel]').forEach((button) => {
+          const active = button.dataset.channel === name;
+          button.setAttribute('aria-pressed', String(active));
+          button.classList.toggle('is-selected', active);
+        });
+        byId('channel-title').textContent = item.title;
+        byId('channel-subtitle').textContent = item.subtitle;
+        byId('detail-status').textContent = item.status;
+        byId('detail-status').className = `status ${item.tone}`;
+        byId('base-url').value = item.base;
+        byId('api-key').value = item.key;
+        byId('model').innerHTML = `<option>${item.model}</option>`;
+        byId('test-result').textContent = item.result;
+        byId('route-preview').textContent = item.route;
+      };
+      root.querySelectorAll('[data-channel]').forEach((button) => button.addEventListener('click', () => apply(button.dataset.channel)));
+      byId('probe').addEventListener('click', () => {
+        byId('test-result').textContent = selected === 'sakura' ? '检查通过：认证与模型发现正常（示意）。' : '需要先保存完整渠道配置。';
+      });
+      byId('test').addEventListener('click', () => {
+        byId('test-result').textContent = selected === 'sakura' ? '将生成 1 张低成本测试图，并在完成后显示实际耗时与渠道账单记录。' : '需要先完成配置，避免误发收费请求。';
+      });
+      byId('replace-key').addEventListener('click', () => {
+        byId('api-key').value = '输入新密钥后保存；界面不再回显明文';
+        byId('api-key').readOnly = false;
+        byId('api-key').focus();
+      });
+      byId('add-channel').addEventListener('click', () => {
+        byId('test-result').textContent = '新渠道创建时必须填写：名称、地址、密钥、模型、预算上限和回退优先级。';
+      });
+    })();
+  </script>
+</section>

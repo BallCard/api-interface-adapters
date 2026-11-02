@@ -6,5 +6,9 @@ node_modules/
 tmp/
 output/
 clean_claude_api/data/sessions/
+video/data/
+image-hub/.env.local
+image-hub/channels.local.json
+image-hub/data/
 Thumbs.db
 .DS_Store

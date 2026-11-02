@@ -11,9 +11,14 @@
     "image:generate": "node image2/generate.mjs",
     "image2:start": "node image2/server.mjs",
     "image2:generate": "node image2/generate.mjs",
+    "image-hub:start": "node image-hub/server.mjs",
+    "video:start": "node video/server.mjs",
+    "video:generate": "node video/generate.mjs",
+    "health": "node health-check.mjs",
     "check:chat": "node --check clean_claude_api/src/server.mjs && node --check clean_claude_api/src/cli.mjs && node --check clean_claude_api/src/probe.mjs",
-    "check:image": "node --check image2/server.mjs && node --check image2/generate.mjs",
-    "check": "npm run check:chat && npm run check:image"
+    "check:image": "node --check image2/server.mjs && node --check image2/generate.mjs && node --check image-hub/server.mjs && node --check image-hub/public/app.js",
+    "check:video": "node --check video/server.mjs && node --check video/generate.mjs",
+    "check": "npm run check:chat && npm run check:image && npm run check:video"
   },
   "dependencies": {
     "openai": "^6.0.1"

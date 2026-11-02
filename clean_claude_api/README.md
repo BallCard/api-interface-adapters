@@ -61,6 +61,8 @@ cd D:\Workspace\projects\api-interface-adapters\clean_claude_api
 npm run chat
 ```
 
+The CLI follows the adapter `HOST` and `PORT` automatically unless you override it with `CHAT_BASE_URL`.
+
 From workspace root:
 
 ```powershell

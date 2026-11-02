@@ -1,0 +1,6 @@
+{
+  "prompt": "A blue circle centered on a white background.",
+  "model": "image-model-example",
+  "n": 1,
+  "output_format": "png"
+}

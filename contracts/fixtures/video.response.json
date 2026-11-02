@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "video": {
+    "id": "video_fixture_001",
+    "model": "video-model-example",
+    "status": "queued",
+    "progress": 0
+  },
+  "history_id": "video_fixture_001"
+}

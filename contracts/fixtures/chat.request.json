@@ -1,0 +1,12 @@
+{
+  "session_id": "contract-demo",
+  "model": "sonnet",
+  "max_tokens": 128,
+  "save_history": false,
+  "messages": [
+    {
+      "role": "user",
+      "content": "Return the word ready."
+    }
+  ]
+}

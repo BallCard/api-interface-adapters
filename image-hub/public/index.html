@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Workbench</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="sidebar">
+        <div class="brand"><span class="brand-mark">A</span><span>AI Workbench</span></div>
+        <nav aria-label="主导航">
+          <button class="nav-item" data-view="overview" aria-current="page">工作台</button>
+          <button class="nav-item" data-view="image">生图</button>
+          <button class="nav-item" data-view="video">生视频</button>
+          <button class="nav-item" data-view="chat">聊天</button>
+          <button class="nav-item nav-bottom" data-view="settings">设置</button>
+        </nav>
+        <div id="serviceSummary" class="service-summary" aria-live="polite"></div>
+      </aside>
+
+      <section class="workspace">
+        <header class="topbar"><div><p id="viewKicker" class="eyebrow">LOCAL WORKSPACE</p><h1 id="viewTitle">工作台</h1></div><div class="actions"><span id="globalStatus" class="quiet-status">正在读取本地服务</span><button id="startAll" type="button" class="secondary">启动全部并检查健康</button></div></header>
+
+        <section class="view" data-view-panel="overview">
+          <div class="intro"><h2>从一个入口开始创作</h2><p>图像、视频、聊天各自保持独立适配器；这里负责选择工具、查看状态和回到最近工作。</p></div>
+          <div id="toolCards" class="tool-grid"></div>
+          <section class="recent-section"><div class="section-heading"><div><p class="eyebrow">RECENT</p><h2>最近图像任务</h2></div><button class="text-button" data-view="image">查看全部</button></div><div id="overviewTasks" class="recent-list"></div></section>
+        </section>
+
+        <section class="view" data-view-panel="image" hidden>
+          <div class="section-heading"><div><p class="eyebrow">IMAGE</p><h2>生成图像</h2><p>创建任务后再执行。任务会保存到统一素材库。</p></div><button class="text-button" data-view="settings">管理渠道</button></div>
+          <section class="work-split"><form id="taskForm" class="compose-panel"><label>提示词<textarea id="taskPrompt" rows="7" required placeholder="描述想生成的画面、主体、镜头和风格"></textarea></label><div class="form-grid"><label>渠道<select id="taskChannel"></select></label><label>数量<input id="taskCount" type="number" value="1" min="1" max="4" required /></label></div><label>输出项目目录 <span class="hint">留空保存至素材库</span><input id="taskDestination" list="projectDestinations" placeholder="projects/my-project" /></label><datalist id="projectDestinations"></datalist><button type="submit" class="primary">创建图像任务</button></form><aside class="info-panel"><span class="metric" id="assetCount">0</span><strong>个已存素材</strong><p>生成图片自动以本地资产形式保存，适合回看与复用。</p><button class="text-button" data-scroll-to="assets">查看素材库</button></aside></section>
+          <p id="result" class="result" aria-live="polite"></p><div id="taskList" class="task-list"></div>
+          <section id="assets" class="library-section"><div class="section-heading"><div><p class="eyebrow">ASSET LIBRARY</p><h2>素材库</h2></div></div><div id="assetList" class="asset-list" aria-live="polite"></div></section>
+        </section>
+
+        <section class="view" data-view-panel="video" hidden>
+          <div class="section-heading"><div><p class="eyebrow">VIDEO</p><h2>生成视频</h2><p>提交后由视频适配器异步处理，完成状态会保存在本地历史中。</p></div><span id="videoServiceStatus" class="quiet-status"></span></div>
+          <section class="work-split"><form id="videoForm" class="compose-panel"><label>提示词<textarea id="videoPrompt" rows="7" required placeholder="描述镜头、主体、动作和节奏"></textarea></label><div class="form-grid"><label>时长 <span class="hint">可选</span><select id="videoSeconds"><option value="">使用模型默认</option><option value="4">4 秒</option><option value="8">8 秒</option><option value="12">12 秒</option></select></label><label>画面尺寸 <span class="hint">可选</span><select id="videoSize"><option value="">使用模型默认</option><option value="1280x720">1280 × 720</option><option value="720x1280">720 × 1280</option></select></label></div><button id="videoSubmit" type="submit" class="primary">创建视频任务</button></form><aside class="info-panel"><strong>当前模型</strong><p id="videoModel">等待视频服务启动</p><p class="hint">当前通道只保证提示词生视频；参考图能力取决于上游模型。</p></aside></section>
+          <p id="videoResult" class="result" aria-live="polite"></p><div id="videoHistory" class="task-list"></div>
+        </section>
+
+        <section class="view" data-view-panel="chat" hidden>
+          <div class="section-heading"><div><p class="eyebrow">CHAT</p><h2>聊天</h2><p>独立对话服务保存会话历史，不与图像和视频任务混在一起。</p></div><span id="chatServiceStatus" class="quiet-status"></span></div>
+          <section class="launch-panel"><div><h3>进入对话工作区</h3><p>使用已有的 Claude 兼容聊天界面，保留历史会话和模型回退策略。</p></div><div class="actions"><button id="startChat" type="button" class="secondary">启动聊天服务</button><a id="openChat" class="primary link-button" href="http://127.0.0.1:8787" target="_blank" rel="noreferrer">打开聊天</a></div></section>
+        </section>
+
+        <section class="view" data-view-panel="settings" hidden>
+          <div class="section-heading"><div><p class="eyebrow">SETTINGS</p><h2>服务与图像渠道设置</h2><p>三个服务各自保存地址、密钥与模型；密钥不会在页面回显。</p></div><a class="text-button" href="/api/ledger" target="_blank" rel="noreferrer">查看账本 JSON</a></div>
+          <section class="service-settings"><div class="section-heading compact-heading"><div><p class="eyebrow">SERVICE CONNECTIONS</p><h3>服务连接</h3></div><span class="hint">默认中转站：https://api.toskaxy.xyz/v1</span></div><div id="serviceConfigList" class="service-config-list" aria-live="polite"></div></section>
+          <div class="section-heading compact-heading"><div><p class="eyebrow">IMAGE PROVIDERS</p><h3>图像供应商</h3></div></div>
+          <section class="settings-layout"><aside id="channelList" class="channel-list" aria-label="图像渠道"></aside><section class="compose-panel"><div class="panel-title"><h3 id="title">加载中</h3><span id="status" class="status">--</span></div><form id="channelForm"><label>渠道名称<input id="label" required maxlength="80" /></label><label>API 地址<input id="baseUrl" type="url" placeholder="https://api.toskaxy.xyz/v1" /></label><label>默认模型<select id="model"></select><span id="imageModelHint" class="hint">点击“检测可用模型”后选择</span></label><div class="form-grid"><label>优先级<input id="priority" type="number" min="1" max="999" required /></label><label>单次最多图片<input id="maxImages" type="number" min="1" max="4" required /></label></div><div class="form-grid"><label>每张估算成本（¥）<input id="estimatedImageCostCny" type="number" min="0" step="0.01" required /></label><label>单次预算上限（¥）<input id="maxEstimatedCostCny" type="number" min="0" step="0.01" required /></label></div><label>替换 API Key <span class="hint">留空则保留当前密钥</span><input id="apiKey" type="password" autocomplete="new-password" /></label><label class="switch"><input id="enabled" type="checkbox" /> 启用此渠道</label><div class="actions"><button type="submit" class="primary">保存配置</button><button id="probe" type="button" class="secondary">检测可用模型</button><button id="paidTest" type="button" class="danger">付费测试图</button></div></form><img id="testImage" class="test-image" alt="测试图片" hidden /></section></section>
+        </section>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

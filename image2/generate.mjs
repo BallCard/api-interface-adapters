@@ -2,8 +2,32 @@ import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
-const DEFAULT_ENDPOINT = process.env.IMAGE2_API_URL ?? "http://localhost:3000/api/image2/generate";
+const ADAPTER_DIR = path.resolve(process.cwd(), "image2");
+loadEnvFile(path.join(ADAPTER_DIR, ".env.local"));
+
+const HOST = process.env.HOST || "127.0.0.1";
+const PORT = Number.parseInt(process.env.PORT ?? "3000", 10);
+const DEFAULT_ENDPOINT = process.env.IMAGE2_API_URL ?? `http://${HOST}:${PORT}/api/image2/generate`;
 const DEFAULT_OUTPUT = "output/image2/generated-image.png";
+
+function loadEnvFile(filePath) {
+  try {
+    const raw = fs.readFileSync(filePath, "utf8");
+    for (const line of raw.split(/\r?\n/)) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) continue;
+      const eq = trimmed.indexOf("=");
+      if (eq === -1) continue;
+      const key = trimmed.slice(0, eq).trim();
+      const value = trimmed.slice(eq + 1).trim();
+      if (key && !(key in process.env)) {
+        process.env[key] = value;
+      }
+    }
+  } catch (error) {
+    if (!error || error.code !== "ENOENT") throw error;
+  }
+}
 
 function parseArgs(argv) {
   const args = {};
@@ -37,7 +61,7 @@ Optional:
   --quality high
   --output-format png
   --model gpt-image-2
-  --endpoint http://localhost:3000/api/image2/generate
+  --endpoint http://127.0.0.1:3000/api/image2/generate
   --payload image2/example-request.json
 `);
 }

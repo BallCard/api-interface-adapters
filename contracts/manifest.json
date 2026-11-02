@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "contracts": [
+    {
+      "id": "chat-message",
+      "source": "clean_claude_api/src/server.mjs",
+      "method": "POST",
+      "path": "/v1/messages",
+      "requestFixture": "contracts/fixtures/chat.request.json",
+      "responseFixture": "contracts/fixtures/chat.response.json",
+      "requiredRequest": ["messages"],
+      "requiredResponse": ["session_id", "requested_model", "model", "reply", "fallback_attempts", "raw"],
+      "failure": { "status": 500, "reason": "missing messages or unavailable upstream" }
+    },
+    {
+      "id": "image-generation",
+      "source": "image2/server.mjs",
+      "method": "POST",
+      "path": "/api/image2/generate",
+      "requestFixture": "contracts/fixtures/image.request.json",
+      "responseFixture": "contracts/fixtures/image.response.json",
+      "requiredRequest": ["prompt"],
+      "requiredResponse": ["ok", "model", "created", "data"],
+      "failure": { "status": 400, "reason": "missing prompt" }
+    },
+    {
+      "id": "video-generation",
+      "source": "video/server.mjs",
+      "method": "POST",
+      "path": "/api/video/generate",
+      "requestFixture": "contracts/fixtures/video.request.json",
+      "responseFixture": "contracts/fixtures/video.response.json",
+      "requiredRequest": ["prompt"],
+      "requiredResponse": ["ok", "video", "history_id"],
+      "failure": { "status": 400, "reason": "missing prompt" }
+    },
+    {
+      "id": "image-hub-task",
+      "source": "image-hub/server.mjs",
+      "method": "POST",
+      "path": "/api/tasks",
+      "requestFixture": "contracts/fixtures/image-hub-task.request.json",
+      "responseFixture": "contracts/fixtures/image-hub-task.response.json",
+      "requiredRequest": ["channel_id", "prompt"],
+      "requiredResponse": ["task.id", "task.status", "task.request.channel_id", "task.request.prompt"],
+      "failure": { "status": 400, "reason": "invalid channel_id or missing prompt" }
+    }
+  ]
+}

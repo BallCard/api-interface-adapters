@@ -1,0 +1,18 @@
+{
+  "task": {
+    "id": "task_00000000000000000000000000000000",
+    "source": "generation",
+    "status": "draft",
+    "createdAt": "2000-01-01T00:00:00.000Z",
+    "updatedAt": "2000-01-01T00:00:00.000Z",
+    "request": {
+      "channel_id": "fixture-channel",
+      "prompt": "A simple geometric study in blue and white.",
+      "n": 1,
+      "output_destination": null,
+      "output_format": "png"
+    },
+    "runs": [],
+    "lastError": null
+  }
+}

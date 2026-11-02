@@ -1,0 +1,6 @@
+{
+  "channel_id": "fixture-channel",
+  "prompt": "A simple geometric study in blue and white.",
+  "n": 1,
+  "output_format": "png"
+}

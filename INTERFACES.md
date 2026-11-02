@@ -14,7 +14,7 @@ Its job is to make three things explicit:
 upstream relay API
   -> clean_claude_api  (chat)
   -> image2            (image generation)
-  -> video             (planned)
+  -> video             (video generation)
 ```
 
 ## Interface Map
@@ -23,7 +23,8 @@ upstream relay API
 | --- | --- | --- | --- | --- | --- | --- |
 | `clean_claude_api` | active | Anthropic-compatible bridge | `UPSTREAM_BASE_URL` | `POST /chat`, `POST /chat/stream`, `POST /v1/messages` | `8787` | Local chat bridge with session persistence, CLI, and web UI |
 | `image2` | active | OpenAI-compatible image bridge | `OPENAI_BASE_URL` or OpenAI default | `POST /api/image2/generate` | `3000` | Stable local image-generation entrypoint and CLI wrapper |
-| `video` | planned | video-generation bridge | same relay pattern | TBD | TBD | Keep video generation separate from chat and image adapters |
+| `image-hub` | active | primary image-material control plane | per-channel OpenAI-compatible endpoints | visual UI, `POST /api/tasks`, `POST /api/tasks/:id/run` | `4100` | Channel configuration, task lifecycle, unified asset library, Workspace project output routing, no-cost probes, paid-test guard, and request ledger |
+| `video` | active | relay-backed video bridge | `OPENAI_BASE_URL` | `POST /api/video/generate`, `GET /api/video/:id`, `GET /api/video/:id/content`, `GET /api/video/history` | `4000` | Stable local video job bridge with create, retrieve, download, and local history routes |
 
 ## Environment Contract
 
@@ -67,18 +68,39 @@ Optional:
 - `OPENAI_BASE_URL`
 - `OPENAI_IMAGE_MODEL`
 - `IMAGE2_API_URL`
+- `HOST`
 - `PORT`
+
+### `image-hub`
+
+- configuration: `image-hub/channels.local.json` (ignored; contains no keys)
+- keys: `image-hub/.env.local` (ignored; one `IMAGE_HUB_<CHANNEL>_API_KEY` per channel)
+- UI: `http://127.0.0.1:4100`
+- generated Base64 is decoded locally and returned as an asset URL, never relayed in an LLM-facing response
+- `GET /api/assets` is the unified material library; each task may set `output_destination` to an existing `projects/<project>` folder, otherwise output stays in the default library
+- paid tests require explicit confirmation; generation never auto-falls back to another channel
 
 ### `video`
 
-Not added yet.
+Required:
 
-When created, document at least:
+- `OPENAI_API_KEY`
 
-- required upstream env variables
-- local HTTP entrypoint
-- output contract
-- relation to `image2`
+Optional:
+
+- `OPENAI_BASE_URL`
+- `OPENAI_VIDEO_MODEL`
+- `VIDEO_API_URL`
+- `VIDEO_DATA_DIR`
+- `HOST`
+- `PORT`
+
+Current tested relay behavior:
+
+- relay: `https://sakura886.site/v1`
+- tested default model: `AA-veo31fast-720p`
+- prompt-only create requests work
+- image reference mode is currently rejected by the tested default model
 
 ## Management Rule
 

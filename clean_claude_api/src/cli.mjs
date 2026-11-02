@@ -1,9 +1,38 @@
+import fs from "node:fs";
+import path from "node:path";
 import readline from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
+import { fileURLToPath } from "node:url";
 
-const BASE_URL = (process.env.CHAT_BASE_URL || "http://127.0.0.1:8787").replace(/\/$/, "");
+const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
+const ADAPTER_DIR = path.resolve(MODULE_DIR, "..");
+
+loadEnvFile(path.join(ADAPTER_DIR, ".env.local"));
+
+const HOST = process.env.HOST || "127.0.0.1";
+const PORT = Number(process.env.PORT || 8787);
+const BASE_URL = (process.env.CHAT_BASE_URL || `http://${HOST}:${PORT}`).replace(/\/$/, "");
 const SESSION_ID = process.env.CHAT_SESSION_ID || "daily";
 const MODEL = process.env.CHAT_MODEL || "opus";
+
+function loadEnvFile(filePath) {
+  try {
+    const raw = fs.readFileSync(filePath, "utf8");
+    for (const line of raw.split(/\r?\n/)) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) continue;
+      const eq = trimmed.indexOf("=");
+      if (eq === -1) continue;
+      const key = trimmed.slice(0, eq).trim();
+      const value = trimmed.slice(eq + 1).trim();
+      if (key && !(key in process.env)) {
+        process.env[key] = value;
+      }
+    }
+  } catch (error) {
+    if (!error || error.code !== "ENOENT") throw error;
+  }
+}
 
 function blue(text) {
   return `\u001b[34m${text}\u001b[0m`;

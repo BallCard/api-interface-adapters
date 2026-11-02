@@ -1,0 +1,37 @@
+{
+  "channels": [
+    {
+      "id": "sakura",
+      "label": "Sakura · gpt-image-2",
+      "baseUrl": "https://sakura886.site/v1",
+      "model": "gpt-image-2",
+      "enabled": true,
+      "priority": 1,
+      "maxImages": 1,
+      "estimatedImageCostCny": 2,
+      "maxEstimatedCostCny": 2
+    },
+    {
+      "id": "openai-official",
+      "label": "OpenAI 官方",
+      "baseUrl": "https://api.openai.com/v1",
+      "model": "gpt-image-2",
+      "enabled": false,
+      "priority": 2,
+      "maxImages": 1,
+      "estimatedImageCostCny": 2,
+      "maxEstimatedCostCny": 2
+    },
+    {
+      "id": "backup-relay",
+      "label": "备用中转",
+      "baseUrl": "",
+      "model": "",
+      "enabled": false,
+      "priority": 3,
+      "maxImages": 1,
+      "estimatedImageCostCny": 2,
+      "maxEstimatedCostCny": 2
+    }
+  ]
+}

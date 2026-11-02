@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "model": "image-model-example",
+  "created": 0,
+  "data": [
+    {
+      "index": 0,
+      "b64_json": "fixture-only-not-image-data",
+      "revised_prompt": null
+    }
+  ]
+}

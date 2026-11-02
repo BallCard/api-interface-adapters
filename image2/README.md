@@ -20,7 +20,8 @@ It provides:
 - `OPENAI_API_KEY`: required
 - `OPENAI_BASE_URL`: optional OpenAI-compatible endpoint, for example `https://sakura886.site/v1`
 - `OPENAI_IMAGE_MODEL`: optional, defaults to `gpt-image-2`
-- `IMAGE2_API_URL`: optional CLI target override, defaults to `http://localhost:3000/api/image2/generate`
+- `IMAGE2_API_URL`: optional CLI target override, defaults to `http://127.0.0.1:${PORT}/api/image2/generate`
+- `HOST`: optional local listen host, defaults to `127.0.0.1`
 - `PORT`: optional local service port, defaults to `3000`
 
 ## Start the service
@@ -39,6 +40,8 @@ PowerShell:
 $env:OPENAI_API_KEY="your-key"
 $env:OPENAI_BASE_URL="https://sakura886.site/v1"
 $env:OPENAI_IMAGE_MODEL="gpt-image-2"
+$env:HOST="127.0.0.1"
+$env:PORT="3000"
 npm run image2:start
 ```
 
